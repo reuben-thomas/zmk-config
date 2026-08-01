@@ -16,8 +16,17 @@
 #define RAISE 2
 #define ADJUST 3
 
-#define ZMK_POINTING_DEFAULT_MOVE_VAL 9000
+#define ZMK_POINTING_DEFAULT_MOVE_VAL 4500
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 150
+
+&mmv {
+    time-to-max-speed-ms = <500>;
+};
+
+&msc {
+    acceleration-exponent = <1>;
+    time-to-max-speed-ms = <500>;
+};
 
 / {
 

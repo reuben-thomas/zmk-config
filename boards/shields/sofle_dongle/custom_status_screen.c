@@ -3,7 +3,7 @@
  *
  *   +--------------------------------+
  *   | L  88%   R  92%                |  <- battery of each split half
- *   | (kbd) Base                     |  <- highest active layer
+ *   | default                 42 WPM |  <- highest active layer + typing speed
  *   +--------------------------------+
  *
  * The built in battery widget only knows about the battery of the device it
@@ -11,6 +11,9 @@
  * halves are only available on the central, via the peripheral battery events
  * raised when CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING is enabled,
  * so the per side display is done with a small custom widget here.
+ *
+ * The layer and WPM widgets are custom too: the built in ones prefix the layer
+ * with a keyboard glyph and print the WPM as a bare number.
  */
 
 #include <zephyr/kernel.h>
@@ -23,20 +26,82 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/display/status_screen.h>
 #include <zmk/event_manager.h>
 
-#if IS_ENABLED(CONFIG_ZMK_WIDGET_LAYER_STATUS)
-#include <zmk/display/widgets/layer_status.h>
+#include <zmk/events/layer_state_changed.h>
+#include <zmk/keymap.h>
 
-static struct zmk_widget_layer_status layer_status_widget;
-#endif
+static lv_obj_t *layer_label;
+
+struct layer_state {
+    zmk_keymap_layer_index_t index;
+    const char *name;
+};
+
+static void set_layer_text(struct layer_state state) {
+    if (state.name == NULL || strlen(state.name) == 0) {
+        char text[8] = {};
+
+        snprintf(text, sizeof(text), "%u", state.index);
+
+        lv_label_set_text(layer_label, text);
+    } else {
+        lv_label_set_text(layer_label, state.name);
+    }
+}
+
+static struct layer_state layer_get_state(const zmk_event_t *eh) {
+    zmk_keymap_layer_index_t index = zmk_keymap_highest_layer_active();
+
+    return (struct layer_state){
+        .index = index,
+        .name = zmk_keymap_layer_name(zmk_keymap_layer_index_to_id(index)),
+    };
+}
+
+ZMK_DISPLAY_WIDGET_LISTENER(widget_layer, struct layer_state, set_layer_text, layer_get_state)
+
+ZMK_SUBSCRIPTION(widget_layer, zmk_layer_state_changed);
+
+#if IS_ENABLED(CONFIG_ZMK_WPM)
+
+#include <zmk/events/wpm_state_changed.h>
+#include <zmk/wpm.h>
+
+static lv_obj_t *wpm_label;
+
+struct wpm_state {
+    uint8_t wpm;
+};
+
+static void set_wpm_text(struct wpm_state state) {
+    char text[12] = {};
+
+    snprintf(text, sizeof(text), "%u WPM", state.wpm);
+
+    lv_label_set_text(wpm_label, text);
+}
+
+static struct wpm_state wpm_get_state(const zmk_event_t *eh) {
+    return (struct wpm_state){.wpm = zmk_wpm_get_state()};
+}
+
+ZMK_DISPLAY_WIDGET_LISTENER(widget_wpm, struct wpm_state, set_wpm_text, wpm_get_state)
+
+ZMK_SUBSCRIPTION(widget_wpm, zmk_wpm_state_changed);
+
+#endif /* IS_ENABLED(CONFIG_ZMK_WPM) */
 
 #if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING)
 
 #include <zmk/events/battery_state_changed.h>
 #include <zmk/split/central.h>
 
-/* Peripheral sources, in the order the halves are paired to the dongle. */
-#define SPLIT_SOURCE_LEFT 0
-#define SPLIT_SOURCE_RIGHT 1
+/*
+ * Peripheral sources, in the order the halves are paired to the dongle. The
+ * right half claims slot 0 and the left half slot 1 on this keyboard, which is
+ * the opposite of what the naming suggests.
+ */
+#define SPLIT_SOURCE_RIGHT 0
+#define SPLIT_SOURCE_LEFT 1
 #define SPLIT_SOURCE_COUNT 2
 
 struct split_battery_state {
@@ -100,11 +165,18 @@ lv_obj_t *zmk_display_status_screen() {
     widget_split_battery_init();
 #endif
 
-#if IS_ENABLED(CONFIG_ZMK_WIDGET_LAYER_STATUS)
-    zmk_widget_layer_status_init(&layer_status_widget, screen);
-    lv_obj_set_style_text_font(zmk_widget_layer_status_obj(&layer_status_widget),
-                               &lv_font_montserrat_14, LV_PART_MAIN);
-    lv_obj_align(zmk_widget_layer_status_obj(&layer_status_widget), LV_ALIGN_BOTTOM_LEFT, 0, 0);
+    layer_label = lv_label_create(screen);
+    lv_obj_set_style_text_font(layer_label, &lv_font_montserrat_14, LV_PART_MAIN);
+    lv_obj_align(layer_label, LV_ALIGN_BOTTOM_LEFT, 0, 0);
+
+    widget_layer_init();
+
+#if IS_ENABLED(CONFIG_ZMK_WPM)
+    wpm_label = lv_label_create(screen);
+    lv_obj_set_style_text_font(wpm_label, &lv_font_montserrat_14, LV_PART_MAIN);
+    lv_obj_align(wpm_label, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+
+    widget_wpm_init();
 #endif
 
     return screen;

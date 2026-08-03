@@ -26,7 +26,7 @@ config BT_MAX_PAIRED
     default 7
 
 # 128x32 SSD1306 OLED on the XIAO I2C pins, driven by the custom status screen
-# in custom_status_screen.c (per side battery + active layer).
+# in custom_status_screen.c (per side battery + active layer + WPM).
 if ZMK_DISPLAY
 
 config I2C
@@ -39,11 +39,19 @@ choice ZMK_DISPLAY_STATUS_SCREEN
     default ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
 endchoice
 
-config ZMK_WIDGET_LAYER_STATUS
+# The layer and WPM widgets on the status screen are custom, so the built in
+# ones stay off; this only enables the WPM tracking they read from.
+config ZMK_WPM
     default y
 
 config LV_Z_MEM_POOL_SIZE
     default 4096
+
+# ZMK implies LV_CONF_MINIMAL, which leaves the label widget out unless a widget
+# selects it. The built in ones do, but every widget here is custom, so the
+# status screen has to ask for it itself.
+config LV_USE_LABEL
+    default y
 
 config LV_FONT_MONTSERRAT_12
     default y

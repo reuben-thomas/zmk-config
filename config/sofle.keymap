@@ -45,46 +45,45 @@
         default_layer {
             display-name = "default";
             bindings = <
-&kp ESC    &kp N1 &kp N2   &kp N3   &kp N4    &kp N5                           &kp N6    &kp N7    &kp N8    &kp N9   &kp N0   &kp GRAVE
-&kp TAB    &kp Q  &kp W    &kp E    &kp R     &kp T                            &kp Y     &kp U     &kp I     &kp O    &kp P    &kp DEL
-&kp LCTRL  &kp A  &kp S    &kp D    &kp F     &kp G                            &kp H     &kp J     &kp K     &kp L    &kp SEMI &kp SQT
-&kp LSHIFT &kp Z  &kp X    &kp C    &kp V     &kp B     &none      &none       &kp N     &kp M     &kp COMMA &kp DOT  &kp FSLH &kp RSHFT
-                  &kp CLCK &kp LALT &kp LGUI  &mo LOWER &kp SPACE  &kp RET     &mo RAISE &kp BSPC  &kp RGUI  &kp K_PP
+&kp ESC     &kp N1  &kp N2    &kp N3    &kp N4    &kp N5                           &kp N6     &kp N7    &kp N8           &kp N9      &kp N0    &kp GRAVE
+&kp TAB     &kp Q   &kp W     &kp E     &kp R     &kp T                            &kp Y      &kp U     &kp I            &kp O       &kp P     &kp DEL
+&kp LCTRL   &kp A   &kp S     &kp D     &kp F     &kp G                            &kp H      &kp J     &kp K            &kp L       &kp SEMI  &kp SQT
+&kp LSHIFT  &kp Z   &kp X     &kp C     &kp V     &kp B      &none        &none    &kp N      &kp M     &kp COMMA        &kp DOT     &kp FSLH  &kp RSHFT
+                    &kp CLCK  &kp LALT  &kp LGUI  &mo LOWER  &kp SPACE    &kp RET  &mo RAISE  &kp BSPC  &kp RIGHT_SHIFT  &kp K_MUTE
             >;
         };
 
         lower_layer {
             display-name = "lower";
             bindings = <
-&bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4                  &trans    &trans       &trans      &trans    &trans    &trans
-&trans     &trans       &trans       &trans       &trans       &trans                        &trans    &kp MINUS    &kp EQUAL   &kp LBKT  &kp RBKT  &kp BSLH
-&trans     &kp EXCL     &kp AT       &kp HASH     &kp DLLR     &kp PRCNT                     &kp CARET &kp AMPS     &kp ASTRK   &kp LPAR  &kp RPAR  &kp TILDE
-&trans     &trans       &trans       &trans       &trans       &trans                        &trans    &trans       &trans      &kp UNDER &kp PLUS  &kp LBRC  &kp RBRC  &kp PIPE
-                        &trans       &trans       &trans       &trans        &trans  &trans  &trans    &trans       &trans      &trans
+&bt BT_CLR  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4                    &trans     &trans     &trans     &trans    &trans    &trans
+&trans      &trans        &trans        &trans        &trans        &trans                          &trans     &kp MINUS  &kp EQUAL  &kp LBKT  &kp RBKT  &kp BSLH
+&trans      &kp EXCL      &kp AT        &kp HASH      &kp DLLR      &kp PRCNT                       &kp CARET  &kp AMPS   &kp ASTRK  &kp LPAR  &kp RPAR  &kp TILDE
+&trans      &trans        &trans        &trans        &trans        &trans        &trans    &trans  &trans     &kp UNDER  &kp PLUS   &kp LBRC  &kp RBRC  &kp PIPE
+                          &trans        &trans        &trans        &trans        &trans    &trans  &trans     &trans     &trans     &trans
             >;
         };
 
         raise_layer {
             display-name = "raise";
             bindings = <
-&kp F12    &kp F1    &kp F2      &kp F3      &kp F4    &kp F5                    &kp F6    &kp F7    &kp F8    &kp F9    &kp F10   &kp F11
-&kp ESC    &kp N1    &kp N2      &kp N3      &kp N4    &kp N5                    &kp N6    &kp N7    &kp N8    &kp N9    &kp N0    &kp GRAVE
-&trans     &kp HOME  &kp PG_DN   &kp PG_UP   &kp END   &trans                    &kp LEFT  &kp DOWN  &kp UP    &kp RIGHT &trans    &trans
-&trans     &trans    &trans      &trans      &trans    &trans     &trans &trans  &trans    &kp MINUS &kp EQUAL &kp LBKT  &kp RBKT  &kp BSLH
-                     &trans     &trans       &trans    &trans     &trans &trans  &trans    &trans   &trans    &trans
+&kp F12  &kp F1    &kp F2     &kp F3     &kp F4   &kp F5                    &kp F6    &kp F7     &kp F8     &kp F9     &kp F10   &kp F11
+&kp ESC  &kp N1    &kp N2     &kp N3     &kp N4   &kp N5                    &kp N6    &kp N7     &kp N8     &kp N9     &kp N0    &kp GRAVE
+&trans   &kp HOME  &kp PG_DN  &kp PG_UP  &kp END  &trans                    &kp LEFT  &kp DOWN   &kp UP     &kp RIGHT  &trans    &trans
+&trans   &trans    &trans     &trans     &trans   &trans  &trans    &trans  &trans    &kp MINUS  &kp EQUAL  &kp LBKT   &kp RBKT  &kp BSLH
+                   &trans     &trans     &trans   &trans  &trans    &trans  &trans    &trans     &trans     &trans
             >;
         };
 
         adjust_layer {
             display-name = "adjust";
             bindings = <
-&none  &kp C_BRI_DN &kp C_BRI_UP &kp K_MUTE  &kp K_VOL_DN  &kp K_VOL_UP                            &none          &none           &none        &none           &none &none
-&none  &none          &none      &none       &none         &none                                   &msc SCRL_LEFT &msc SCRL_DOWN  &msc SCRL_UP &msc SCRL_RIGHT &none &none
-&none  &mkp MB1       &mkp MB2   &mkp MB3    &mkp MB4      &none                                   &mmv MOVE_LEFT &mmv MOVE_DOWN  &mmv MOVE_UP &mmv MOVE_RIGHT &none &none
-&none  &none          &none      &none       &none         &none             &none        &none    &none          &none           &none        &none           &none &none
-                      &trans     &trans      &trans        &trans            &trans       &trans   &trans         &trans          &trans       &trans
+&none  &kp C_BRI_DN  &kp C_BRI_UP  &kp K_MUTE  &kp K_VOL_DN  &kp K_VOL_UP                    &none           &none           &none         &none            &none  &none
+&none  &none         &none         &none       &none         &none                           &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_UP  &msc SCRL_RIGHT  &none  &none
+&none  &mkp MB1      &mkp MB2      &mkp MB3    &mkp MB4      &mkp MB5                        &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT  &none  &none
+&none  &none         &none         &none       &none         &none         &none     &none   &none           &none           &none         &none            &none  &none
+                     &trans        &trans      &trans        &trans        &trans    &trans  &trans          &trans          &trans        &trans
             >;
         };
-
     };
 };

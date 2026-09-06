@@ -17,13 +17,18 @@ config ZMK_SPLIT
 config ZMK_SPLIT_BLE_CENTRAL_PERIPHERALS
     default 2
 
-# ZMK_SPLIT_BLE_CENTRAL_PERIPHERALS (2) + desired BT profiles (default is 5)
+# ZMK_SPLIT_BLE_CENTRAL_PERIPHERALS (2) + desired BT profiles (2). The
+# controller reserves RAM and radio scheduling slots per configured connection
+# rather than per active one, so keep this only as large as it needs to be: the
+# dongle is USB powered and rarely needs more than a couple of host profiles.
 config BT_MAX_CONN
-    default 7
+    default 4
 
-# Set this to the same number as BT_MAX_CONN
+# Set this to the same number as BT_MAX_CONN. ZMK_BLE_PROFILE_COUNT is derived
+# as BT_MAX_PAIRED - ZMK_SPLIT_BLE_CENTRAL_PERIPHERALS, so this leaves profiles
+# 0 and 1; &bt BT_SEL 2 and above become no-ops.
 config BT_MAX_PAIRED
-    default 7
+    default 4
 
 # 128x32 SSD1306 OLED on the XIAO I2C pins, driven by the custom status screen
 # in custom_status_screen.c (per side battery + active layer + WPM).

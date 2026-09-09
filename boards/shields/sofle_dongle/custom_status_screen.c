@@ -1,19 +1,10 @@
 /*
- * Custom status screen for the dongle's 128x32 SSD1306 OLED.
+ * 128x32 SSD1306 OLED.
  *
- *   +--------------------------------+
- *   | L  88%   R  92%                |  <- battery of each split half
- *   | default                 42 WPM |  <- highest active layer + typing speed
- *   +--------------------------------+
- *
- * The built in battery widget only knows about the battery of the device it
- * runs on, which on a dongle build is the dongle itself. The levels of the two
- * halves are only available on the central, via the peripheral battery events
- * raised when CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING is enabled,
- * so the per side display is done with a small custom widget here.
- *
- * The layer and WPM widgets are custom too: the built in ones prefix the layer
- * with a keyboard glyph and print the WPM as a bare number.
+ * +--------------------------------+
+ * | L  88%   R  92%                |
+ * | default                 42 WPM |
+ * +--------------------------------+
  */
 
 #include <zephyr/kernel.h>
@@ -32,32 +23,33 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 static lv_obj_t *layer_label;
 
 struct layer_state {
-    zmk_keymap_layer_index_t index;
-    const char *name;
+  zmk_keymap_layer_index_t index;
+  const char *name;
 };
 
 static void set_layer_text(struct layer_state state) {
-    if (state.name == NULL || strlen(state.name) == 0) {
-        char text[8] = {};
+  if (state.name == NULL || strlen(state.name) == 0) {
+    char text[8] = {};
 
-        snprintf(text, sizeof(text), "%u", state.index);
+    snprintf(text, sizeof(text), "%u", state.index);
 
-        lv_label_set_text(layer_label, text);
-    } else {
-        lv_label_set_text(layer_label, state.name);
-    }
+    lv_label_set_text(layer_label, text);
+  } else {
+    lv_label_set_text(layer_label, state.name);
+  }
 }
 
 static struct layer_state layer_get_state(const zmk_event_t *eh) {
-    zmk_keymap_layer_index_t index = zmk_keymap_highest_layer_active();
+  zmk_keymap_layer_index_t index = zmk_keymap_highest_layer_active();
 
-    return (struct layer_state){
-        .index = index,
-        .name = zmk_keymap_layer_name(zmk_keymap_layer_index_to_id(index)),
-    };
+  return (struct layer_state){
+      .index = index,
+      .name = zmk_keymap_layer_name(zmk_keymap_layer_index_to_id(index)),
+  };
 }
 
-ZMK_DISPLAY_WIDGET_LISTENER(widget_layer, struct layer_state, set_layer_text, layer_get_state)
+ZMK_DISPLAY_WIDGET_LISTENER(widget_layer, struct layer_state, set_layer_text,
+                            layer_get_state)
 
 ZMK_SUBSCRIPTION(widget_layer, zmk_layer_state_changed);
 
@@ -69,22 +61,23 @@ ZMK_SUBSCRIPTION(widget_layer, zmk_layer_state_changed);
 static lv_obj_t *wpm_label;
 
 struct wpm_state {
-    uint8_t wpm;
+  uint8_t wpm;
 };
 
 static void set_wpm_text(struct wpm_state state) {
-    char text[12] = {};
+  char text[12] = {};
 
-    snprintf(text, sizeof(text), "%u WPM", state.wpm);
+  snprintf(text, sizeof(text), "%u WPM", state.wpm);
 
-    lv_label_set_text(wpm_label, text);
+  lv_label_set_text(wpm_label, text);
 }
 
 static struct wpm_state wpm_get_state(const zmk_event_t *eh) {
-    return (struct wpm_state){.wpm = zmk_wpm_get_state()};
+  return (struct wpm_state){.wpm = zmk_wpm_get_state()};
 }
 
-ZMK_DISPLAY_WIDGET_LISTENER(widget_wpm, struct wpm_state, set_wpm_text, wpm_get_state)
+ZMK_DISPLAY_WIDGET_LISTENER(widget_wpm, struct wpm_state, set_wpm_text,
+                            wpm_get_state)
 
 ZMK_SUBSCRIPTION(widget_wpm, zmk_wpm_state_changed);
 
@@ -105,45 +98,46 @@ ZMK_SUBSCRIPTION(widget_wpm, zmk_wpm_state_changed);
 #define SPLIT_SOURCE_COUNT 2
 
 struct split_battery_state {
-    uint8_t levels[SPLIT_SOURCE_COUNT];
+  uint8_t levels[SPLIT_SOURCE_COUNT];
 };
 
 static lv_obj_t *split_battery_label;
 
 /* A level of 0 means that half has not reported anything to us yet. */
 static void format_level(char *buf, size_t len, uint8_t level) {
-    if (level == 0) {
-        snprintf(buf, len, "  --");
-    } else {
-        snprintf(buf, len, "%3u%%", level);
-    }
+  if (level == 0) {
+    snprintf(buf, len, "  --");
+  } else {
+    snprintf(buf, len, "%3u%%", level);
+  }
 }
 
 static void set_split_battery_text(struct split_battery_state state) {
-    char left[5] = {};
-    char right[5] = {};
-    char text[16] = {};
+  char left[5] = {};
+  char right[5] = {};
+  char text[16] = {};
 
-    format_level(left, sizeof(left), state.levels[SPLIT_SOURCE_LEFT]);
-    format_level(right, sizeof(right), state.levels[SPLIT_SOURCE_RIGHT]);
+  format_level(left, sizeof(left), state.levels[SPLIT_SOURCE_LEFT]);
+  format_level(right, sizeof(right), state.levels[SPLIT_SOURCE_RIGHT]);
 
-    snprintf(text, sizeof(text), "L %s  R %s", left, right);
+  snprintf(text, sizeof(text), "L %s  R %s", left, right);
 
-    lv_label_set_text(split_battery_label, text);
+  lv_label_set_text(split_battery_label, text);
 }
 
-static struct split_battery_state split_battery_get_state(const zmk_event_t *eh) {
-    struct split_battery_state state = {};
+static struct split_battery_state
+split_battery_get_state(const zmk_event_t *eh) {
+  struct split_battery_state state = {};
 
-    for (uint8_t source = 0; source < SPLIT_SOURCE_COUNT; source++) {
-        uint8_t level = 0;
+  for (uint8_t source = 0; source < SPLIT_SOURCE_COUNT; source++) {
+    uint8_t level = 0;
 
-        if (zmk_split_central_get_peripheral_battery_level(source, &level) == 0) {
-            state.levels[source] = level;
-        }
+    if (zmk_split_central_get_peripheral_battery_level(source, &level) == 0) {
+      state.levels[source] = level;
     }
+  }
 
-    return state;
+  return state;
 }
 
 ZMK_DISPLAY_WIDGET_LISTENER(widget_split_battery, struct split_battery_state,
@@ -154,30 +148,31 @@ ZMK_SUBSCRIPTION(widget_split_battery, zmk_peripheral_battery_state_changed);
 #endif /* IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING) */
 
 lv_obj_t *zmk_display_status_screen() {
-    lv_obj_t *screen;
-    screen = lv_obj_create(NULL);
+  lv_obj_t *screen;
+  screen = lv_obj_create(NULL);
 
 #if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING)
-    split_battery_label = lv_label_create(screen);
-    lv_obj_set_style_text_font(split_battery_label, &lv_font_montserrat_12, LV_PART_MAIN);
-    lv_obj_align(split_battery_label, LV_ALIGN_TOP_LEFT, 0, 0);
+  split_battery_label = lv_label_create(screen);
+  lv_obj_set_style_text_font(split_battery_label, &lv_font_montserrat_12,
+                             LV_PART_MAIN);
+  lv_obj_align(split_battery_label, LV_ALIGN_TOP_LEFT, 0, 0);
 
-    widget_split_battery_init();
+  widget_split_battery_init();
 #endif
 
-    layer_label = lv_label_create(screen);
-    lv_obj_set_style_text_font(layer_label, &lv_font_montserrat_14, LV_PART_MAIN);
-    lv_obj_align(layer_label, LV_ALIGN_BOTTOM_LEFT, 0, 0);
+  layer_label = lv_label_create(screen);
+  lv_obj_set_style_text_font(layer_label, &lv_font_montserrat_14, LV_PART_MAIN);
+  lv_obj_align(layer_label, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
-    widget_layer_init();
+  widget_layer_init();
 
 #if IS_ENABLED(CONFIG_ZMK_WPM)
-    wpm_label = lv_label_create(screen);
-    lv_obj_set_style_text_font(wpm_label, &lv_font_montserrat_14, LV_PART_MAIN);
-    lv_obj_align(wpm_label, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+  wpm_label = lv_label_create(screen);
+  lv_obj_set_style_text_font(wpm_label, &lv_font_montserrat_14, LV_PART_MAIN);
+  lv_obj_align(wpm_label, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
 
-    widget_wpm_init();
+  widget_wpm_init();
 #endif
 
-    return screen;
+  return screen;
 }

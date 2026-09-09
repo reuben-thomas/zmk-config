@@ -29,8 +29,4 @@ include:
   - board: seeeduino_xiao_ble
     shield: sofle_dongle
   - board: seeeduino_xiao_ble
-    shield: sofle_dongle
-    cmake-args: -DCONFIG_ZMK_USB_LOGGING=y
-    artifact-name: sofle_dongle_logging
-  - board: seeeduino_xiao_ble
     shield: settings_reset

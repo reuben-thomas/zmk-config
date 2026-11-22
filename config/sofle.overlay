@@ -1,0 +1,20 @@
+/ {
+    wake_keys {
+        compatible = "gpio-keys";
+        wake_row_shift: wake_row_shift {
+            gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
+        };
+    };
+
+    wake_shift: wake_shift {
+        compatible = "zmk,gpio-key-wakeup-trigger";
+        trigger = <&wake_row_shift>;
+        wakeup-source;
+        extra-gpios = <&pro_micro 19 GPIO_ACTIVE_HIGH>;
+    };
+
+    soft_off_wakers {
+        compatible = "zmk,soft-off-wakeup-sources";
+        wakeup-sources = <&wake_shift>;
+    };
+};
